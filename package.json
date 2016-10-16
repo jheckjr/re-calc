@@ -1,0 +1,27 @@
+{
+  "name": "re-calc",
+  "version": "1.0.0",
+  "description": "Real estate calculations",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha --compilers js:babel-core/register src/index.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jheckjr/re-calc.git"
+  },
+  "author": "jheckjr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jheckjr/re-calc/issues"
+  },
+  "homepage": "https://github.com/jheckjr/re-calc#readme",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.16.0",
+    "babel-core": "^6.17.0",
+    "babel-preset-es2015": "^6.16.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2"
+  }
+}
