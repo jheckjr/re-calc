@@ -1,0 +1,19 @@
+Real Estate Calculations
+
+Mortgage amount (purchase price and downpayment)
+Mortgage payment
+Cash outlay
+Gross revenue/month and /year
+Cost/unit
+Cap rate
+Gross rent multiplier
+Cash ROI
+Total ROI
+Debt service coverage ratio
+Cash flow (annual and monthly)
+Increases over number of years for revenue, expenses, ROI, etc
+Gross income
+Total expenses
+NOI
+Equity accrued
+Appreciation
