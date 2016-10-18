@@ -98,4 +98,97 @@ describe('calc-functions', function() {
 			expect(calcFunctions.unitCost(229000, 4)).to.equal(57250);
 		});
 	});
+
+	describe('capRate', function() {
+		it('should be 0 if price <= 0', function() {
+			expect(calcFunctions.capRate()).to.equal(0);
+			expect(calcFunctions.capRate(0,1000)).to.equal(0);
+		});
+		it('should be noi / price', function() {
+			expect(calcFunctions.capRate(114000,8579)).to.be.within(7.5,7.6);
+			expect(calcFunctions.capRate(100000,-1000)).to.be.within(-1.1,-1.0);
+		});
+	});
+
+	describe('grossRentMult', function() {
+		it('should be 0 if inputs <= 0', function() {
+			expect(calcFunctions.grossRentMult()).to.equal(0);
+			expect(calcFunctions.grossRentMult(0,0)).to.equal(0);
+			expect(calcFunctions.grossRentMult(-1,1)).to.equal(0);
+			expect(calcFunctions.grossRentMult(1,-1)).to.equal(0);
+		});
+		it('should be price / grossRev', function() {
+			expect(calcFunctions.grossRentMult(128990,18000)).to.be.within(7.15,7.2);
+		});
+	});
+
+	describe('cashROI', function() {
+		it('should be 0 if cash outlay is 0', function() {
+			expect(calcFunctions.cashROI()).to.equal(0);
+			expect(calcFunctions.cashROI(1000,0)).to.equal(0);
+		});
+		it('should be cash flow / cash outlay', function() {
+			expect(calcFunctions.cashROI(2651,22970)).to.be.within(11.5,11.6);
+		});
+	});
+
+	describe('totalROI', function() {
+		it('should be 0 if cash outlay is 0', function() {
+			expect(calcFunctions.totalROI()).to.equal(0);
+			expect(calcFunctions.totalROI(1000,1000,100,0)).to.equal(0);
+		});
+		it('should be sum / cash outlay', function() {
+			expect(calcFunctions.totalROI(1933,1290,2651,22970)).to.be.within(25.5,25.6);
+		});
+	});
+
+	describe('debtSCRatio', function() {
+		it('should be 0 if loan payment is 0', function() {
+			expect(calcFunctions.debtSCRatio()).to.equal(0);
+			expect(calcFunctions.debtSCRatio(1000,0)).to.equal(0);
+		});
+		it('should be noi / loan payment', function() {
+			expect(calcFunctions.debtSCRatio(8579,5928)).to.be.within(1.44, 1.46);
+		});
+	});
+
+	describe('cashFlow', function() {
+		it('should be noi - loan payment', function() {
+			expect(calcFunctions.cashFlow(8579,5928)).to.equal(2651);
+		});
+	});
+
+	describe('grossIncome', function() {
+		it('should be 0 if vacancy rate not within [0,1]', function() {
+			expect(calcFunctions.grossIncome(18000,8)).to.equal(0);
+		});
+		it('should be grossRev * (1-vacancyRate)', function() {
+			expect(calcFunctions.grossIncome(18000,0.08)).to.equal(16560);
+		});
+	});
+
+	describe('totalExpenses', function() {
+		it('should be 0 if no expenses', function() {
+			expect(calcFunctions.totalExpenses([])).to.equal(0);
+		});
+		it('should be sum of expenses', function() {
+			expect(calcFunctions.totalExpenses([1760,480,1325,2700,1716])).to.equal(7981);
+		});
+	});
+
+    // Remove ceil from functions and change tests
+	describe('makeAmortSchedule', function() {
+		it('should be [0] if inputs are 0', function() {
+			expect(calcFunctions.makeAmortSchedule()).to.eql([0]);
+			expect(calcFunctions.makeAmortSchedule(-1,10,10)).to.eql([0]);
+			expect(calcFunctions.makeAmortSchedule(1000,-10,10)).to.eql([0]);
+			expect(calcFunctions.makeAmortSchedule(1000,10,-10)).to.eql([0]);
+		});
+		it('should be an amortization schedule in an array', function() {
+			let schedule = calcFunctions.makeAmortSchedule(106020,3.8,30);
+			expect(schedule[0]).to.equal(106020);
+			expect(schedule[1]).to.be.within(104087,104088);
+			expect(schedule[30]).to.equal(0);
+		});
+	});
 });

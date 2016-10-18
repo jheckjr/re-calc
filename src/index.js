@@ -107,111 +107,114 @@ function unitCost(totalCost=0, numUnits=0) {
 	return Math.ceil(totalCost / numUnits);
 }
 
-// /*
-//  * Cap rate
-//  * Input: NOI
-//  *		  purchase cost
-//  * Output: cap rate (percentage)
-//  */
-// function capRate(purchasePrice=0, noi=0) {
-// 	if (purchasePrice <= 0)
-// 		return 0;
+/*
+ * Cap rate
+ * Input: NOI
+ *		  purchase cost
+ * Output: cap rate (percentage)
+ */
+function capRate(purchasePrice=0, noi=0) {
+	if (purchasePrice <= 0)
+		return 0;
 
-// 	let capRate = noi / purchasePrice;
-// 	return capRate.toFixed(1);
-// }
+	let capRate = (noi / purchasePrice) * 100;
+	return capRate;
+}
 
-// /*
-//  * Gross rent multiplier
-//  * Input: purchase price
-//  *		  gross revenue per year
-//  * Output: gross rent multiplier
-//  */
-// function grossRentMult(purchasePrice=0, grossRev=0) {
-// 	if (purchasePrice <= 0 || grossRev <= 0) 
-// 		return 0;
+/*
+ * Gross rent multiplier
+ * Input: purchase price
+ *		  gross revenue per year
+ * Output: gross rent multiplier
+ */
+function grossRentMult(purchasePrice=0, grossRev=0) {
+	if (purchasePrice <= 0 || grossRev <= 0) 
+		return 0;
 
-// 	let grm = purchasePrice / grossRev;
-// 	return grm.toFixed(1);
-// }
+	let grm = purchasePrice / grossRev;
+	return grm;
+}
 
+/*
+ * Cash ROI
+ * Input: annual cash flow
+ *		  cash outlay
+ * Output: cash ROI percentage
+ */
+function cashROI(cashFlow=0, cashOutlay=0) {
+	if (cashOutlay === 0) 
+		return 0;
 
-//  * Cash ROI
-//  * Input: annual cash flow
-//  *		  cash outlay
-//  * Output: cash ROI percentage
- 
-// function cashROI(cashFlow=0, cashOutlay=0) {
-// 	if (cashOutlay === 0) 
-// 		return 0;
+	let roi = (cashFlow / cashOutlay) * 100;
+	return roi;
+}
 
-// 	let roi = cashFlow / cashOutlay;
-// 	return roi.toFixed(1);
-// }
+/*
+ * Total ROI
+ * Input: equity accrued
+ *   	  appreciation
+ *		  annual cash flow
+ *		  cash outlay
+ * Output: total ROI percentage
+ */
+function totalROI(equity=0, appreciation=0, cashFlow=0, cashOutlay=0) {
+	if (cashOutlay === 0) 
+		return 0;
 
-// /*
-//  * Total ROI
-//  * Input: equity accrued
-//  *   	  appreciation
-//  *		  annual cash flow
-//  *		  cash outlay
-//  * Output: total ROI percentage
-//  */
-// function totalROI(equity=0, appreciation=0, cashFlow=0, cashOutlay=0) {
-// 	if (cashOutlay === 0) 
-// 		return 0;
+	let roi = ((equity + appreciation + cashFlow) / cashOutlay) * 100;
+	return roi;
+}
 
-// 	let roi = (equity + appreciation + cashFlow) / cashOutlay;
-// 	return roi.toFixed(1);
-// }
+/*
+ * Debt service coverage ratio (DSCR)
+ * Input: annual NOI
+ *		  annual mortgage payment
+ * Output: DSCR
+ */
+function debtSCRatio(noi=0, loanPayment=0) {
+	if (loanPayment === 0) 
+		return 0;
 
-// /*
-//  * Debt service coverage ratio (DSCR)
-//  * Input: annual NOI
-//  *		  annual mortgage payment
-//  * Output: DSCR
-//  */
-// function debtSCRatio(noi=0, loanPayment=0) {
-// 	if (loanPayment === 0) 
-// 		return 0;
+	let dscr = noi / loanPayment;
+	return dscr;
+}
 
-// 	let dscr = noi / loanPayment;
-// 	return dscr.toFixed(2);
-// }
+/*
+ * Cash flow
+ * Input: noi
+ *		  mortgage payment
+ * Output: cash flow amount
+ */
+function cashFlow(noi=0, loanPayment=0) {
+	return Math.ceil(noi - loanPayment);
+}
 
-// /*
-//  * Cash flow
-//  * Input: noi
-//  *		  mortgage payment
-//  * Output: cash flow amount
-//  */
-// function cashFlow(noi=0, loanPayment=0) {
-// 	return Math.ceil(noi - loanPayment);
-// }
+/*
+ * Gross income
+ * Input: gross revenue
+ *		  vacancy rate (decimal [0, 1])
+ * Output: gross income
+ */
+function grossIncome(grossRev=0, vacancyRate=0) {
+	if (vacancyRate < 0 || 1 < vacancyRate)
+		return 0;
 
-// /*
-//  * Gross income
-//  * Input: gross revenue
-//  *		  vacancy rate (decimal [0, 1])
-//  * Output: gross income
-//  */
-// function grossIncome(grossRev=0, vacancyRate=0) {
-// 	return Math.ceil(grossRev * (1-vacancyRate));
-// }
+	return Math.ceil(grossRev * (1-vacancyRate));
+}
 
-// /*
-//  * Total expenses
-//  * Input: list of annual expenses
-//  * Output: sum of expenses
-//  */
-// function totalExpenses(expenses=[]) {
-// 	if (expenses.length === 0)
-// 		return 0;
+/*
+ * Total expenses
+ * Input: list of annual expenses
+ * Output: sum of expenses
+ */
+function totalExpenses(expenses=[]) {
+	if (expenses.length === 0)
+		return 0;
 
-// 	return Math.ceil(expenses.reduce(function(prev, curr) {
-// 		return prev + curr;
-// 	}));
-// }
+	return Math.ceil(expenses.reduce(function(prev, curr) {
+		return prev + curr;
+	}));
+}
 
 /*
  * NOI
@@ -269,32 +272,33 @@ function noi(grossIncome=0, totalExpenses=0) {
 // 		return Math.ceil(totalApp);
 // }
 
-// /*
-//  * Create amortization schedule
-//  * Input: loan amount
-//  * 		  interest rate
-//  *		  loan payment
-//  *		  loan term (years)
-//  * Output: array of yearly remaining loan amounts
-//  */
-// function makeAmortSchedule(loanAmount=0, loanPayment=0, intRate=0, loanTerm=0) {
-// 	if (loanAmount <= 0 || loanPayment <= 0 || intRate <= 0 || loanTerm <= 0)
-// 		return [0];
+/*
+ * Create amortization schedule
+ * Input: loan amount
+ * 		  interest rate
+ *		  loan term (years)
+ * Output: array of yearly remaining loan amounts
+ */
+function makeAmortSchedule(loanAmount=0, intRate=0, loanTerm=0) {
+	if (loanAmount <= 0 || intRate <= 0 || loanTerm <= 0)
+		return [0];
 
-// 	let schedule = [loanAmount];
-// 	let monthlyRate = intRate / 12;
-// 	let monthlyRem = loanAmount;
+	let schedule = [loanAmount];
+	let monthlyRate = (intRate / 100) / 12;
+	let monthlyRem = loanAmount;
+	let payment = this.loanPayment(loanAmount, intRate, loanTerm);
+	console.log(payment);
 
-// 	for (let i = 1; i <= loanTerm*12; i++) {
-// 		let principal = loanPayment - (monthlyRem * monthlyRate);
-// 		monthlyRem -= principal;
+	for (let i = 1; i <= loanTerm*12; i++) {
+		let principal = payment - (monthlyRem * monthlyRate);
+		monthlyRem -= principal;
 
-// 		if (i % 12 === 0)
-// 			schedule.push(monthlyRem);
-// 	}
+		if (i % 12 === 0)
+			schedule.push(monthlyRem);
+	}
 
-// 	return schedule;
-// }
+	return schedule;
+}
 
 module.exports = {
 	loanAmount: loanAmount,
@@ -303,6 +307,15 @@ module.exports = {
 	downpaymentAmount: downpaymentAmount,
 	grossRevenue: grossRevenue,
 	unitCost: unitCost,
+	capRate: capRate,
+	grossRentMult: grossRentMult,
+	cashROI: cashROI,
+	totalROI: totalROI,
+	debtSCRatio: debtSCRatio,
+	cashFlow: cashFlow,
+	grossIncome: grossIncome,
+	totalExpenses: totalExpenses,
+	makeAmortSchedule: makeAmortSchedule,
 
 	noi: noi
 };
