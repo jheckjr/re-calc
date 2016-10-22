@@ -24,7 +24,7 @@ var CalculatorBox = React.createClass({
 				loanTerm: 0
 			},
 			rentalInfo: {
-				monthlyRent: [],
+				monthlyRent: [0],
 				otherIncome: 0,
 				vacancyRate: 0,
 				electricity: 0,
@@ -135,7 +135,7 @@ var PropInfoBox = React.createClass({
 var PurchaseInfoBox = React.createClass({
 	render: function() {
 		var totalCost = this.props.purchaseInfo.purchasePrice + this.props.purchaseInfo.closingCost + this.props.purchaseInfo.repairCost;
-		var downpaymentAmt = this.props.purchaseInfo.downpayment * this.props.purchaseInfo.purchasePrice;
+		var downpaymentAmt = reCalc.downpaymentAmount(this.props.purchaseInfo.purchasePrice, this.props.purchaseInfo.downpayment);
 		var loanAmt = reCalc.loanAmount(this.props.purchaseInfo.purchasePrice, downpaymentAmt);
 		var loanPayment = reCalc.loanPayment(loanAmt, this.props.purchaseInfo.intRate, this.props.purchaseInfo.loanTerm);
 
@@ -202,39 +202,35 @@ var PurchaseInfoBox = React.createClass({
 
 var RentalInfoBox = React.createClass({
 	render: function() {
+		var totalUtil = this.props.rentalInfo.electricity + this.props.rentalInfo.gas + this.props.rentalInfo.water + this.props.rentalInfo.sewer + this.props.rentalInfo.trash + this.props.rentalInfo.other;
+
+		var rents = [];
+		this.props.rentalInfo.forEach(function(rent, index) {
+			let holder = "Unit " + index;
+			rents.push(
+				<input
+					type="number"
+					placeholder={holder}
+				/>
+			);
+		});
+
 		return (
 			<div className="rentalInfoBox">
 				<h2>Rental Info</h2>
 				<form className="propInfoForm">
 					<label>
-						Monthly Rent
-						<input
-							type="number"
-						/>
-					</label>
-					<span>-OR-</span>
-					<label>
-						# of Units
+						Number of Units
 						<select>
+							<option value="1">1</option>
 							<option value="2">2</option>
 							<option value="3">3</option>
 							<option value="4">4</option>
 						</select>
 					</label>
 					<label>
-						Monthly Rents
-						<input
-							type="number"
-						/>
-						<input
-							type="number"
-						/>
-						<input
-							type="number"
-						/>
-						<input
-							type="number"
-						/>
+						Monthly Rent
+						{rents}
 					</label>
 					<label>
 						Other Income
@@ -286,7 +282,7 @@ var RentalInfoBox = React.createClass({
 						/>
 					</label>
 					<span>Total Utilities</span>
-					<span>$-,---</span>
+					<span>$ {totalUtil}</span>
 					<label>
 						Repairs / Capex (%)
 						<input
@@ -342,6 +338,45 @@ var RentalInfoBox = React.createClass({
 
 var ResultsBox = React.createClass({
 	render: function() {
+		var totalCost = this.props.purchaseInfo.purchasePrice + this.props.purchaseInfo.closingCost + this.props.purchaseInfo.repairCost;
+		var downpaymentAmt = reCalc.downpaymentAmount(this.props.purchaseInfo.purchasePrice, this.props.purchaseInfo.downpayment);
+		var cashOutlay = this.props.purchaseInfo.closingCost + this.props.purchaseInfo.repairCost + downpaymentAmt;
+
+		var grossRevMon = reCalc.grossRevenue(this.props.rentalInfo.monthlyRent, this.props.rentalInfo.otherIncome);
+		var grossRevAnn = grossRevMon * 12;
+		var grossIncMon = reCalc.grossIncome(grossRevMon, this.props.rentalInfo.vacancyRate);
+		var grossIncAnn = grossIncMon * 12;
+
+		var expenses = [this.props.rentalInfo.electricity,
+						this.props.rentalInfo.gas,
+						this.props.rentalInfo.water,
+						this.props.rentalInfo.sewer,
+						this.props.rentalInfo.trash,
+						this.props.rentalInfo.other,
+						this.props.rentalInfo.repairs * grossRevMon / 100,
+						this.props.rentalInfo.propMgmt * grossIncMon / 100,
+						this.props.rentalInfo.propTax / 12,
+						this.props.rentalInfo.insurance / 12];
+		var expensesMon = reCalc.totalExpenses(expenses);
+		var expensesAnn = expensesMon * 12;
+
+		var noi = reCalc.noi(grossIncAnn, expensesAnn);
+		var loanAmt = reCalc.loanAmount(this.props.purchaseInfo.purchasePrice, downpaymentAmt);
+		var loanPayment = reCalc.loanPayment(loanAmt, this.props.purchaseInfo.intRate, this.props.purchaseInfo.loanTerm);
+		var cashFlowMon = reCalc.cashFlow(noi, loanPayment);
+		var cashFlowAnn = cashFlowMon * 12;
+		var cashROI = reCalc.cashROI(cashFlowAnn, cashOutlay);
+
+		var amortSchedule = reCalc.makeAmortSchedule(loanAmt, this.props.purchaseInfo.intRate, this.props.purchaseInfo.loanTerm);
+		var equity = reCalc.equity(amortSchedule, 1);
+		var totalEquity = propValue - amortSchedule[1];
+		var propValue = this.props.purchaseInfo.arv + reCalc.appreciation(this.props.purchaseInfo.arv, this.props.rentalInfo.appreciation, 1, true);
+		var appreciation = this.props.purchaseInfo.arv + reCalc.appreciation(this.props.purchaseInfo.arv, this.props.rentalInfo.appreciation, 1);
+		var totalROI = reCalc.totalROI(equity, appreciation, cashFlowAnn, cashOutlay);
+		var capRate = reCalc.capRate(this.props.purchaseInfo.purchasePrice, noi);
+		var grm = reCalc.grossRentMult(this.props.purchaseInfo.purchasePrice, grossRevAnn);
+		var dscr = reCalc.debtSCRation(noi, loanPayment);
+
 		return (
 			<div className="resultsBox">
 				<h2>Results</h2>
@@ -355,9 +390,9 @@ var ResultsBox = React.createClass({
 					</thead>
 					<tbody>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {this.props.purchaseInfo.purchasePrice}</td>
+							<td>$ (totalCost}</td>
+							<td>$ {cashOutlay}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -369,16 +404,16 @@ var ResultsBox = React.createClass({
 							<th>Gross Revenue Annual</th>
 						</tr>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {grossRevMon}</td>
+							<td>$ {grossRevAnn}</td>
 						</tr>
 						<tr>
 							<th>Gross Income Monthly</th>
 							<th>Gross Income Annual</th>
 						</tr>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {grossIncMon}</td>
+							<td>$ {grossIncAnn}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -392,8 +427,8 @@ var ResultsBox = React.createClass({
 					</thead>
 					<tbody>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {expensesMon}</td>
+							<td>$ {expensesAnn}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -406,9 +441,9 @@ var ResultsBox = React.createClass({
 							<th>Cash Flow Annual</th>
 						</tr>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {noi}</td>
+							<td>$ {cashFlowMon}</td>
+							<td>$ {cashFlowAnn}</td>
 						</tr>
 						<tr>
 							<th>Cash ROI</th>
@@ -416,17 +451,17 @@ var ResultsBox = React.createClass({
 							<th>Cap Rate</th>
 						</tr>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>$ {cashROI}</td>
+							<td>$ {totalROI}</td>
+							<td>{capRate}</td>
 						</tr>
 						<tr>
 							<th>GRM</th>
 							<th>DSCR</th>
 						</tr>
 						<tr>
-							<td>$--,---</td>
-							<td>$--,---</td>
+							<td>{grm}</td>
+							<td>{dscr}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -436,8 +471,8 @@ var ResultsBox = React.createClass({
 					<option value="1">Year 1</option>
 					<option value="2">Year 2</option>
 				</select>
-				<span>$--,---</span>
-				<span>$--,---</span>
+				<span>$ {totalEquity}</span>
+				<span>$ {propValue}</span>
 			</div>
 		);
 	}

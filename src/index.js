@@ -6,7 +6,7 @@
 // /*
 //  * Mortgage amount
 //  * Input: purchase price
-//  *		  downpayment amount or percentage
+//  *		  downpayment amount
 //  * Output: amount in mortgage in dollars
 //  *
 //  * amount = purchase - downpayment
@@ -15,10 +15,7 @@ function loanAmount(purchasePrice=0, downpayment=0) {
 	if (purchasePrice <= 0 || downpayment <= 0)
 		return 0;
 
-	if (downpayment <= 1) 
-		return purchasePrice * (1-downpayment);
-	else 
-		return purchasePrice - downpayment;
+	return purchasePrice - downpayment;
 }
 
 /*
@@ -68,19 +65,19 @@ function cashOutlay(downpayment=0, closingCost=0, improvCost=0) {
  * Output: downpayment amount
  */
 function downpaymentAmount(purchasePrice=0, downpaymentPct=0) {
-	if (purchasePrice <= 0 || downpaymentPct <= 0 || 1 < downpaymentPct) 
+	if (purchasePrice <= 0 || downpaymentPct <= 0) 
 		return 0;
 
-	return purchasePrice * downpaymentPct;
+	return purchasePrice * downpaymentPct / 100;
 }
 
 /*
  * Gross Revenue
  * Input: monthly rent amounts
  * 		  other revenue sources
- * Output: monthly gross revenue (or annual)
+ * Output: monthly gross revenue
  */
-function grossRevenue(rent=[], otherRev=0, monthly=true) {
+function grossRevenue(rent=[], otherRev=0) {
 	if (rent.length === 0) 
 		return 0;
 
@@ -88,10 +85,7 @@ function grossRevenue(rent=[], otherRev=0, monthly=true) {
 		return prev += curr;
 	});
 
-	if (monthly)
-		return rentAmount + otherRev;
-	else
-		return (rentAmount + otherRev) * 12;
+	return rentAmount + otherRev;
 }
 
 /*
@@ -117,8 +111,7 @@ function capRate(purchasePrice=0, noi=0) {
 	if (purchasePrice <= 0)
 		return 0;
 
-	let capRate = (noi / purchasePrice) * 100;
-	return capRate;
+	return (noi / purchasePrice) * 100;
 }
 
 /*
@@ -131,8 +124,7 @@ function grossRentMult(purchasePrice=0, grossRev=0) {
 	if (purchasePrice <= 0 || grossRev <= 0) 
 		return 0;
 
-	let grm = purchasePrice / grossRev;
-	return grm;
+	return purchasePrice / grossRev;
 }
 
 /*
@@ -145,8 +137,7 @@ function cashROI(cashFlow=0, cashOutlay=0) {
 	if (cashOutlay === 0) 
 		return 0;
 
-	let roi = (cashFlow / cashOutlay) * 100;
-	return roi;
+	return (cashFlow / cashOutlay) * 100;
 }
 
 /*
@@ -161,8 +152,7 @@ function totalROI(equity=0, appreciation=0, cashFlow=0, cashOutlay=0) {
 	if (cashOutlay === 0) 
 		return 0;
 
-	let roi = ((equity + appreciation + cashFlow) / cashOutlay) * 100;
-	return roi;
+	return ((equity + appreciation + cashFlow) / cashOutlay) * 100;
 }
 
 /*
@@ -175,8 +165,7 @@ function debtSCRatio(noi=0, loanPayment=0) {
 	if (loanPayment === 0) 
 		return 0;
 
-	let dscr = noi / loanPayment;
-	return dscr;
+	return noi / loanPayment;
 }
 
 /*
@@ -192,14 +181,14 @@ function cashFlow(noi=0, loanPayment=0) {
 /*
  * Gross income
  * Input: gross revenue
- *		  vacancy rate (decimal [0, 1])
+ *		  vacancy rate (percentage)
  * Output: gross income
  */
 function grossIncome(grossRev=0, vacancyRate=0) {
-	if (vacancyRate < 0 || 1 < vacancyRate)
+	if (vacancyRate < 0 || 100 < vacancyRate)
 		return 0;
 
-	return grossRev * (1-vacancyRate);
+	return grossRev * (1 - (vacancyRate / 100));
 }
 
 /*
@@ -232,12 +221,14 @@ function noi(grossIncome=0, totalExpenses=0) {
  * Output: equity accrued in that year
  * remainingLoanVal is array of yearly remaining loan amounts
  */
-function equity(year=0, total=false) {
+function equity(remainingLoanVal=[], year=0, total=false) {
+	if (remainingLoanVal.length === 0) 
+		return 0;
 	if (year === 0)
-		return this.remainingLoanVal[year];
+		return remainingLoanVal[year];
 
 	if (!total)
-		return this.remainingLoanVal[year-1] - this.remainingLoanVal[year];
+		return remainingLoanVal[year-1] - remainingLoanVal[year];
 	else
 		return this.remainingLoanVal.reduce(function(prev, curr, index, arr) {
 			if (index <= year)

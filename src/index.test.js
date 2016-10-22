@@ -24,10 +24,6 @@ describe('calc-functions', function() {
 			expect(calcFunctions.loanAmount(50000, 10000)).to.equal(40000);
 			expect(calcFunctions.loanAmount(76000, 2)).to.equal(75998);
 		});
-		it('should be price * (1-downpayment) if downpayment <= 1', function() {
-			expect(calcFunctions.loanAmount(50000, 0.2)).to.equal(40000);
-			expect(calcFunctions.loanAmount(50000, 1)).to.equal(0);
-		});
 	});
 
 	describe('loanPayment', function() {
@@ -64,11 +60,10 @@ describe('calc-functions', function() {
 			expect(calcFunctions.downpaymentAmount()).to.equal(0);
 			expect(calcFunctions.downpaymentAmount(-1,1)).to.equal(0);
 			expect(calcFunctions.downpaymentAmount(1,-1)).to.equal(0);
-			expect(calcFunctions.downpaymentAmount(10000, 1.1)).to.equal(0);
 		});
 		it('should be price * downpayment', function() {
-			expect(calcFunctions.downpaymentAmount(100000,0.1)).to.equal(10000);
-			expect(calcFunctions.downpaymentAmount(114000,0.07)).to.be.within(7980,7980.01);
+			expect(calcFunctions.downpaymentAmount(100000,10)).to.equal(10000);
+			expect(calcFunctions.downpaymentAmount(114000,7)).to.be.within(7980,7980.01);
 		});
 	});
 
@@ -80,10 +75,6 @@ describe('calc-functions', function() {
 		it('should be sum of inputs', function() {
 			expect(calcFunctions.grossRevenue([500, 450])).to.equal(950);
 			expect(calcFunctions.grossRevenue([500, 450],100)).to.equal(1050);
-		});
-		it('should be sum of inputs * 12 in annual', function() {
-			expect(calcFunctions.grossRevenue([500, 450],0,false)).to.equal(11400);
-			expect(calcFunctions.grossRevenue([900, 625, 650],75,false)).to.equal(27000);
 		});
 	});
 
@@ -159,11 +150,12 @@ describe('calc-functions', function() {
 	});
 
 	describe('grossIncome', function() {
-		it('should be 0 if vacancy rate not within [0,1]', function() {
-			expect(calcFunctions.grossIncome(18000,8)).to.equal(0);
+		it('should be 0 if vacancy rate not within [0,100]', function() {
+			expect(calcFunctions.grossIncome(18000,-1)).to.equal(0);
+			expect(calcFunctions.grossIncome(18000,101)).to.equal(0);
 		});
 		it('should be grossRev * (1-vacancyRate)', function() {
-			expect(calcFunctions.grossIncome(18000,0.08)).to.equal(16560);
+			expect(calcFunctions.grossIncome(18000,8)).to.equal(16560);
 		});
 	});
 
