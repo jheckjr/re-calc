@@ -39,7 +39,7 @@ describe('calc-functions', function() {
 			expect(calcFunctions.loanPayment(1,0,0)).to.equal(0);
 		});
 		it('should be 430 for input (90000,4,30)', function() {
-			expect(calcFunctions.loanPayment(90000,4,30)).to.equal(430);
+			expect(calcFunctions.loanPayment(90000,4,30)).to.be.within(429.6,429.7);
 		});
 		it('should be 5032 for input (90000,3.8,30,False)', function() {
 			expect(calcFunctions.loanPayment(90000,3.8,30,false)).to.be.within(5032,5034);
@@ -68,7 +68,7 @@ describe('calc-functions', function() {
 		});
 		it('should be price * downpayment', function() {
 			expect(calcFunctions.downpaymentAmount(100000,0.1)).to.equal(10000);
-			expect(calcFunctions.downpaymentAmount(114000,0.07)).to.be.within(7980,7982);
+			expect(calcFunctions.downpaymentAmount(114000,0.07)).to.be.within(7980,7980.01);
 		});
 	});
 
@@ -176,7 +176,6 @@ describe('calc-functions', function() {
 		});
 	});
 
-    // Remove ceil from functions and change tests
 	describe('makeAmortSchedule', function() {
 		it('should be [0] if inputs are 0', function() {
 			expect(calcFunctions.makeAmortSchedule()).to.eql([0]);
@@ -188,7 +187,20 @@ describe('calc-functions', function() {
 			let schedule = calcFunctions.makeAmortSchedule(106020,3.8,30);
 			expect(schedule[0]).to.equal(106020);
 			expect(schedule[1]).to.be.within(104087,104088);
+			expect(schedule[29]).to.be.within(5807,5808);
 			expect(schedule[30]).to.equal(0);
+		});
+	});
+
+	describe('appreciation', function() {
+		it('should be arv if year 0', function() {
+			expect(calcFunctions.appreciation(100000,1,0)).to.equal(100000);
+		});
+		it('should return appreciation in a given year', function() {
+			expect(calcFunctions.appreciation(128990,1,14)).to.be.within(1468,1469);
+		});
+		it('should return total appreciation when total is true', function() {
+			expect(calcFunctions.appreciation(128990,1,14,true)).to.be.within(19280,19281);
 		});
 	});
 });

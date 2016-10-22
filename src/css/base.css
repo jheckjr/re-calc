@@ -1,0 +1,29 @@
+label {
+	font-family: Arial, sans-serif;
+	font-size: 0.8em;
+}
+
+input, textarea, label {
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+span {
+	display: block;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-family: Arial, sans-serif;
+	font-size: 0.8em;		
+}
+
+table {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	font-family: Arial, sans-serif;
+	font-size: 0.8em;		
+}
+
+td, th {
+	text-align: left;
+}

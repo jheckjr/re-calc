@@ -16,9 +16,9 @@ function loanAmount(purchasePrice=0, downpayment=0) {
 		return 0;
 
 	if (downpayment <= 1) 
-		return Math.ceil(purchasePrice * (1-downpayment));
+		return purchasePrice * (1-downpayment);
 	else 
-		return Math.ceil(purchasePrice - downpayment);
+		return purchasePrice - downpayment;
 }
 
 /*
@@ -40,9 +40,9 @@ function loanPayment(loanAmount=0, intRate=0, loanTerm=0, monthly=true) {
 		(Math.pow(1+rate, term) - 1);
 
 	if (monthly) 
-		return Math.ceil(payment);
+		return payment;
 	else
-		return Math.ceil(payment * 12);
+		return payment * 12;
 }
 
 /*
@@ -58,7 +58,7 @@ function cashOutlay(downpayment=0, closingCost=0, improvCost=0) {
 	if (downpayment <= 0 || closingCost <= 0 || improvCost <= 0) 
 		return 0;
 
-	return Math.ceil(downpayment + closingCost + improvCost);
+	return downpayment + closingCost + improvCost;
 }
 
 /*
@@ -71,7 +71,7 @@ function downpaymentAmount(purchasePrice=0, downpaymentPct=0) {
 	if (purchasePrice <= 0 || downpaymentPct <= 0 || 1 < downpaymentPct) 
 		return 0;
 
-	return Math.ceil(purchasePrice * downpaymentPct);
+	return purchasePrice * downpaymentPct;
 }
 
 /*
@@ -89,9 +89,9 @@ function grossRevenue(rent=[], otherRev=0, monthly=true) {
 	});
 
 	if (monthly)
-		return Math.ceil(rentAmount + otherRev);
+		return rentAmount + otherRev;
 	else
-		return Math.ceil((rentAmount + otherRev) * 12);
+		return (rentAmount + otherRev) * 12;
 }
 
 /*
@@ -104,7 +104,7 @@ function unitCost(totalCost=0, numUnits=0) {
 	if (totalCost <= 0 || numUnits <= 0)
 		return 0;
 
-	return Math.ceil(totalCost / numUnits);
+	return totalCost / numUnits;
 }
 
 /*
@@ -186,7 +186,7 @@ function debtSCRatio(noi=0, loanPayment=0) {
  * Output: cash flow amount
  */
 function cashFlow(noi=0, loanPayment=0) {
-	return Math.ceil(noi - loanPayment);
+	return noi - loanPayment;
 }
 
 /*
@@ -199,7 +199,7 @@ function grossIncome(grossRev=0, vacancyRate=0) {
 	if (vacancyRate < 0 || 1 < vacancyRate)
 		return 0;
 
-	return Math.ceil(grossRev * (1-vacancyRate));
+	return grossRev * (1-vacancyRate);
 }
 
 /*
@@ -211,9 +211,9 @@ function totalExpenses(expenses=[]) {
 	if (expenses.length === 0)
 		return 0;
 
-	return Math.ceil(expenses.reduce(function(prev, curr) {
+	return expenses.reduce(function(prev, curr) {
 		return prev + curr;
-	}));
+	});
 }
 
 /*
@@ -223,54 +223,55 @@ function totalExpenses(expenses=[]) {
  * Output: NOI
  */
 function noi(grossIncome=0, totalExpenses=0) {
-	return Math.ceil(grossIncome - totalExpenses);
+	return grossIncome - totalExpenses;
 }
 
-// /*
-//  * Equity accrued
-//  * Input: year
-//  * Output: equity accrued in that year
-//  * remainingLoanVal is array of yearly remaining loan amounts
-//  */
-// function equity(year=0, total=False) {
-// 	if (year === 0)
-// 		return remainingLoanVal[year];
+/*
+ * Equity accrued
+ * Input: year
+ * Output: equity accrued in that year
+ * remainingLoanVal is array of yearly remaining loan amounts
+ */
+function equity(year=0, total=false) {
+	if (year === 0)
+		return this.remainingLoanVal[year];
 
-// 	if (!total)
-// 		return remainingLoanVal[year-1] - remainingLoanVal[year];
-// 	else
-// 		return remainingLoanVal.reduce(function(prev, curr, index, arr) {
-// 			if (index <= year)
-// 				return prev + (arr[index] - arr[index - 1]);
-// 			else
-// 				return prev;
-// 		});
-// }
+	if (!total)
+		return this.remainingLoanVal[year-1] - this.remainingLoanVal[year];
+	else
+		return this.remainingLoanVal.reduce(function(prev, curr, index, arr) {
+			if (index <= year)
+				return prev + (arr[index] - arr[index - 1]);
+			else
+				return prev;
+		});
+}
 
-// /*
-//  * Appreciation
-//  * Input: after repair value
-//  *		  appreciation rate
-//  		  year
-//  * Output: appreciation amount
-//  */
-// function appreciation(arv=0, appRate=0, year=0, total=False) {
-// 	if (year === 0)
-// 		return arv;
+/*
+ * Appreciation
+ * Input: after repair value
+ *		  appreciation rate
+ 		  year
+ * Output: appreciation amount
+ */
+function appreciation(arv=0, appRate=0, year=0, total=false) {
+	if (year === 0)
+		return arv;
 
-// 	let totalApp = 0;
-// 	let annualApp = 0;
+	let totalApp = 0;
+	let annualApp = 0;
+	let rate = appRate / 100;
 
-// 	for (let i = 1; i <= year; i++) {
-// 		annualApp = appRate * (arv + totalApp);
-// 		totalApp += annualApp;
-// 	}
+	for (let i = 1; i <= year; i++) {
+		annualApp = rate * (arv + totalApp);
+		totalApp += annualApp;
+	}
 
-// 	if (!total)
-// 		return Math.ceil(annualApp);
-// 	else
-// 		return Math.ceil(totalApp);
-// }
+	if (!total)
+		return annualApp;
+	else
+		return totalApp;
+}
 
 /*
  * Create amortization schedule
@@ -287,7 +288,6 @@ function makeAmortSchedule(loanAmount=0, intRate=0, loanTerm=0) {
 	let monthlyRate = (intRate / 100) / 12;
 	let monthlyRem = loanAmount;
 	let payment = this.loanPayment(loanAmount, intRate, loanTerm);
-	console.log(payment);
 
 	for (let i = 1; i <= loanTerm*12; i++) {
 		let principal = payment - (monthlyRem * monthlyRate);
@@ -296,6 +296,9 @@ function makeAmortSchedule(loanAmount=0, intRate=0, loanTerm=0) {
 		if (i % 12 === 0)
 			schedule.push(monthlyRem);
 	}
+
+	// Remove rounding error
+	schedule[loanTerm] = 0;
 
 	return schedule;
 }
@@ -316,6 +319,7 @@ module.exports = {
 	grossIncome: grossIncome,
 	totalExpenses: totalExpenses,
 	makeAmortSchedule: makeAmortSchedule,
-
+	appreciation: appreciation,
+	equity: equity,
 	noi: noi
 };
