@@ -2,8 +2,9 @@
   "name": "re-calc",
   "version": "1.0.0",
   "description": "Real estate calculations",
-  "main": "src/index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "nodemon server.js --exec babel-node --presets es2015",
     "test": "mocha --compilers js:babel-core/register src/index.test.js -w"
   },
   "repository": {

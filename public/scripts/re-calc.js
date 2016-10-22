@@ -294,7 +294,7 @@ function makeAmortSchedule(loanAmount=0, intRate=0, loanTerm=0) {
 	return schedule;
 }
 
-module.exports = {
+export {reCalc: {
 	loanAmount: loanAmount,
 	loanPayment: loanPayment,
 	cashOutlay: cashOutlay,
@@ -313,4 +313,4 @@ module.exports = {
 	appreciation: appreciation,
 	equity: equity,
 	noi: noi
-};
+}};

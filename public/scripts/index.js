@@ -1,4 +1,4 @@
-var reCalc = require('../index');
+//import reCalc from "re-calc";
 
 var CalculatorBox = React.createClass({
 	getInitialState: function() {
